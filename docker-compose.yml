@@ -1,0 +1,28 @@
+services:
+  # app:
+  #   build: .
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - .:/app
+  #     - /app/node_modules
+  #   environment:
+  #     - NODE_ENV=development
+  #   depends_on:
+  #     - db
+  #   command: ["npm", "run", "dev"]
+
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: lspdev
+      POSTGRES_PASSWORD: server1goent26sukses
+      POSTGRES_DB: ses_lsp
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

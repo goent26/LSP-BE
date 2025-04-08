@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id            String        @id @default(uuid())
+    nama_lengkap  String
+    email         String        @unique
+    password      String
+    role          String
+    NIK           String?       @unique
+    no_registrasi String?       @unique
+    no_telp       String?
+    alamat        String?
+    pendaftaran   Pendaftaran[]
+}
+
+model ProfileLSP {
+    id            String  @id @default(uuid())
+    no_ik_lisensi String
+    no_lisensi    String
+    jenis         String
+    website_link  String?
+    no_fax        String?
+    no_hp         String?
+    email         String?
+}
+
+model Pendaftaran {
+    id             String               @id @default(uuid())
+    no_registrasi  String               @unique
+    status_daftar  String // pending, diterima, ditolak
+    tanggal_daftar DateTime
+    user_id        String
+    user           User                 @relation(fields: [user_id], references: [id])
+    apl1           APL1?
+    apl2           APL2?
+    sertifikat     Sertifikat?
+    jadwal_ujian   PenjadwalanPeserta[]
+}
+
+model APL1 {
+    id                 String         @id @default(uuid())
+    pendaftaran_id     String         @unique
+    kode_pos           String?
+    tujuan_sertifikasi String?
+    tempat_tgl_lahir   String?
+    kebangsaan         String?
+    pendaftaran        Pendaftaran    @relation(fields: [pendaftaran_id], references: [id])
+    lampiran_apl1      LampiranAPL1[]
+}
+
+model LampiranAPL1 {
+    id                String  @id @default(uuid())
+    apl1_id           String
+    nama_dokumen      String
+    path_file         String
+    status_verifikasi String // memenuhi, tidak_memenuhi, tidak_ada
+    catatan           String?
+    apl1              APL1    @relation(fields: [apl1_id], references: [id])
+}
+
+model APL2 {
+    id              String               @id @default(uuid())
+    pendaftaran_id  String               @unique
+    skema_id        String
+    catatan_peserta String?
+    pendaftaran     Pendaftaran          @relation(fields: [pendaftaran_id], references: [id])
+    unit_kompetensi APL2UnitKompetensi[]
+}
+
+model APL2UnitKompetensi {
+    id                 String  @id @default(uuid())
+    apl2_id            String
+    kode_unit          String
+    nama_unit          String
+    bukti_pendukung    String?
+    status_pre_asesmen String // kompeten, belum_kompeten
+    apl2               APL2    @relation(fields: [apl2_id], references: [id])
+}
+
+model Skema {
+    id          String        @id @default(uuid())
+    nomor_skema String        @unique
+    nama        String
+    jenis       String
+    okupasi     String?
+    klaster     String?
+    unit        Unit[]
+    JadwalUjian JadwalUjian[]
+}
+
+model Unit {
+    id         String      @id @default(uuid())
+    skema_id   String
+    judul_unit String
+    kode_unit  String      @unique
+    skema      Skema       @relation(fields: [skema_id], references: [id])
+    elemen_kuk ElemenKUK[]
+}
+
+model ElemenKUK {
+    id           String @id @default(uuid())
+    unit_id      String
+    judul_elemen String
+    unit         Unit   @relation(fields: [unit_id], references: [id])
+}
+
+model TUK {
+    id          String        @id @default(uuid())
+    nama_tuk    String
+    kode_tuk    String        @unique
+    alamat      String
+    jenis       String // tetap, mandiri
+    JadwalUjian JadwalUjian[]
+}
+
+model JadwalUjian {
+    id            String               @id @default(uuid())
+    skema_id      String
+    tuk_id        String
+    tanggal_ujian DateTime
+    keterangan    String?
+    status        String // belum_dimulai, berlangsung, selesai
+    kapasitas     Int                  @default(24)
+    waktu_mulai   DateTime             @default(now())
+    waktu_selesai DateTime
+    skema         Skema                @relation(fields: [skema_id], references: [id])
+    tuk           TUK                  @relation(fields: [tuk_id], references: [id])
+    peserta       PenjadwalanPeserta[]
+}
+
+model PenjadwalanPeserta {
+    id              String      @id @default(uuid())
+    pendaftaran_id  String
+    jadwal_id       String
+    status_kompeten String // kompeten, belum_kompeten
+    catatan         String?
+    pendaftaran     Pendaftaran @relation(fields: [pendaftaran_id], references: [id])
+    jadwal          JadwalUjian @relation(fields: [jadwal_id], references: [id])
+}
+
+model Sertifikat {
+    id             String      @id @default(uuid())
+    pendaftaran_id String      @unique
+    nomor_sert     String      @unique
+    tanggal_terbit DateTime
+    path_file      String?
+    pendaftaran    Pendaftaran @relation(fields: [pendaftaran_id], references: [id])
+}

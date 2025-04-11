@@ -18,11 +18,11 @@ module.exports = {
 
     // const { user, token } = await service.login({ email, password });
 
-    const { user, token } = await service.register({ email, password });
+    const { user, token } = await service.register({ username, email, password, role });
 
     return new JsonResponse(res, 201)
       .setMainContent(true, 'User registered successfully')
-      .setSuccessPayload({ user })
+      .setSuccessPayload({ user, token })
       .send();
   }),
 

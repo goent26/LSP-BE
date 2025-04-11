@@ -1,8 +1,4 @@
 const { PrismaClient } = require('@prisma/client');
-const dotenv = require('dotenv');
-
-const configENV = `${__dirname}/.env`;
-dotenv.config({ path: configENV }); // Load environment variables
 
 const Database = require('./Database');
 
@@ -15,7 +11,7 @@ const Database = require('./Database');
 // Environment variables
 const {
   NODE_ENV: MODE,
-  DATABASE_URL,
+  DATABASE_URL_CONFIG,
   DATABASE_DEV,
   DATABASE_PROD,
   DATABASE_TEST,
@@ -41,7 +37,7 @@ const selectDB = (MODE) => {
  * @type {Database}
  */
 const database = new Database(PrismaClient, {
-  databaseURL: DATABASE_URL,
+  databaseURL: DATABASE_URL_CONFIG,
   databaseName: selectDB(MODE),
   username: DATABASE_USERNAME,
   password: DATABASE_PASSWORD,

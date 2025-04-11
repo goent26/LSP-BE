@@ -24,8 +24,10 @@ model User {
   nama_lengkap  String
   email         String        @unique
   password      String
+  asal_sekolah  String?
+  kompetensi    String?
+  masa_berlaku  DateTime?
   role          Role
-  NIK           String?       @unique
   no_registrasi String?       @unique
   no_telp       String?
   alamat        String?
@@ -39,11 +41,11 @@ enum JenisLSP {
 }
 
 model ProfileLSP {
-  id            String  @id @default(uuid())
+  id            String   @id @default(uuid())
   no_sk_lisensi String
   no_lisensi    String
   jenis         JenisLSP
-  alamat        String
+  alamat        String?
   website_link  String?
   no_fax        String?
   no_hp         String?
@@ -57,27 +59,28 @@ enum StatusDaftar {
 }
 
 model Pendaftaran {
-  id             String               @id @default(uuid())
-  no_registrasi  String               @unique
-  status_daftar  StatusDaftar
-  tanggal_daftar DateTime
-  user_id        String
-  user           User                 @relation(fields: [user_id], references: [id])
-  apl1           APL1?
-  apl2           APL2?
-  sertifikat     Sertifikat?
-  jadwal_ujian   PenjadwalanPeserta[]
-}
-
-model APL1 {
-  id                 String         @id @default(uuid())
-  pendaftaran_id     String         @unique
-  kode_pos           String?
-  tujuan_sertifikasi String?
-  tempat_tgl_lahir   String?
-  kebangsaan         String?
-  pendaftaran        Pendaftaran    @relation(fields: [pendaftaran_id], references: [id])
-  lampiran_apl1      LampiranAPL1[]
+  id                     String         @id @default(uuid())
+  no_registrasi          String         @unique
+  status_daftar          StatusDaftar
+  tanggal_daftar         DateTime
+  NIK                    String?        @unique
+  paspor                 String?        @unique
+  tempat_lahir           String?
+  tanggal_lahir          DateTime?
+  jenis_kelamin          String?
+  kebangsaan             String?
+  catatan                String?
+  kualifikasi_pendidikan String?
+  tujuan_sertifikasi     String?
+  skema_id               String
+  skema                  Skema          @relation(fields: [skema_id], references: [id])
+  user_id                String
+  user                   User           @relation(fields: [user_id], references: [id])
+  lampiran_apl1          LampiranAPL1[]
+  lampiran_apl2          LampiranAPL2[]
+  sertifikat             Sertifikat?
+  jadwal_ujian_id        String
+  jadwal_ujian           JadwalUjian    @relation(fields: [jadwal_ujian_id], references: [id])
 }
 
 enum StatusVerifikasi {
@@ -87,22 +90,13 @@ enum StatusVerifikasi {
 }
 
 model LampiranAPL1 {
-  id                String  @id @default(uuid())
-  apl1_id           String
+  id                String           @id @default(uuid())
   nama_dokumen      String
   path_file         String
   status_verifikasi StatusVerifikasi
   catatan           String?
-  apl1              APL1    @relation(fields: [apl1_id], references: [id])
-}
-
-model APL2 {
-  id              String               @id @default(uuid())
-  pendaftaran_id  String               @unique
-  skema_id        String
-  catatan_peserta String?
-  pendaftaran     Pendaftaran          @relation(fields: [pendaftaran_id], references: [id])
-  unit_kompetensi APL2UnitKompetensi[]
+  pendaftaran_id    String
+  pendaftaran       Pendaftaran      @relation(fields: [pendaftaran_id], references: [id])
 }
 
 enum StatusPreAsesmen {
@@ -110,14 +104,14 @@ enum StatusPreAsesmen {
   belum_kompeten
 }
 
-model APL2UnitKompetensi {
-  id                 String  @id @default(uuid())
-  apl2_id            String
+model LampiranAPL2 {
+  id                 String           @id @default(uuid())
   kode_unit          String
   nama_unit          String
   bukti_pendukung    String?
   status_pre_asesmen StatusPreAsesmen
-  apl2               APL2    @relation(fields: [apl2_id], references: [id])
+  pendaftaran_id     String
+  pendaftaran        Pendaftaran      @relation(fields: [pendaftaran_id], references: [id])
 }
 
 model Skema {
@@ -127,6 +121,7 @@ model Skema {
   jenis       String
   okupasi     String?
   klaster     String?
+  pendaftaran Pendaftaran[]
   unit        Unit[]
   JadwalUjian JadwalUjian[]
 }
@@ -163,34 +158,34 @@ model TUK {
 }
 
 model JadwalUjian {
-  id            String               @id @default(uuid())
+  id            String        @id @default(uuid())
   skema_id      String
   tuk_id        String
   tanggal_ujian DateTime
   keterangan    String?
   // status        String // belum_dimulai, berlangsung, selesai
-  kapasitas     Int                  @default(24)
-  waktu_mulai   DateTime             @default(now())
+  kapasitas     Int           @default(24)
+  waktu_mulai   DateTime      @default(now())
   waktu_selesai DateTime
-  skema         Skema                @relation(fields: [skema_id], references: [id])
-  tuk           TUK                  @relation(fields: [tuk_id], references: [id])
-  peserta       PenjadwalanPeserta[]
+  skema         Skema         @relation(fields: [skema_id], references: [id])
+  tuk           TUK           @relation(fields: [tuk_id], references: [id])
+  peserta       Pendaftaran[]
 }
 
-enum StatusKompeten {
-  kompeten
-  belum_kompeten
-}
+// enum StatusKompeten {
+//   kompeten
+//   belum_kompeten
+// }
 
-model PenjadwalanPeserta {
-  id              String      @id @default(uuid())
-  pendaftaran_id  String
-  jadwal_id       String
-  status_kompeten StatusKompeten
-  catatan         String?
-  pendaftaran     Pendaftaran @relation(fields: [pendaftaran_id], references: [id])
-  jadwal          JadwalUjian @relation(fields: [jadwal_id], references: [id])
-}
+// model PenjadwalanPeserta {
+//   id              String         @id @default(uuid())
+//   pendaftaran_id  String
+//   jadwal_id       String
+//   status_kompeten StatusKompeten
+//   catatan         String?
+//   pendaftaran     Pendaftaran    @relation(fields: [pendaftaran_id], references: [id])
+//   jadwal          JadwalUjian    @relation(fields: [jadwal_id], references: [id])
+// }
 
 model Sertifikat {
   id             String      @id @default(uuid())

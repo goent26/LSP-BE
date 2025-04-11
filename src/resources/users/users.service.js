@@ -6,7 +6,7 @@ const getDB = () => {
 module.exports = {
   async getAll(filter) {
     const DB = getDB();
-    
+
     // Create the find options object.
     const findOptions = {
       include: {
@@ -19,6 +19,11 @@ module.exports = {
 
     // Retrieve the users.
     const users = await DB.user.findMany(findOptions);
+
+    // Remove password from response
+    users.forEach(user => {
+      delete user.password;
+    });
 
     return users;
   },

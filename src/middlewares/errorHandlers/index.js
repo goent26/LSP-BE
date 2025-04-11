@@ -2,6 +2,7 @@ const { AppError, JsonResponse } = require('../../utils');
 
 // Loader Error Handlers
 const undefinedRouteHandlerLoader = require('./undefinedRoutesHandler');
+// const auhtErrorHandlerLoader = require('./authErrorHandler');
 const globalErrorHandlerLoader = require('./globalErrorHandler');
 
 /**

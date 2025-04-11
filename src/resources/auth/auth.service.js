@@ -10,7 +10,7 @@ const getDB = () => {
 module.exports = {
   async register(data) {
     const db = getDB();
-    const { email, password, username, role = 'pendaftar' } = data;
+    const { username, email, password, role = 'pendaftar' } = data;
 
     // Check if user already exists
     const existingUser = await db.user.findUnique({ where: { email } });
@@ -25,16 +25,23 @@ module.exports = {
     const user = await db.user.create({
       data: {
         email,
-        username,
+        nama_lengkap: username,
         password: hashedPassword,
         role
       }
     });
 
+    // Generate token
+    const token = jwt.sign(
+      { userId: user.id, role: user.role },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
+
     // Remove password from response
     delete user.password;
 
-    return user;
+    return { user, token };
   },
 
   async login(data) {

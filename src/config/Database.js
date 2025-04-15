@@ -86,6 +86,10 @@ class Database {
       },
     });
 
+    await this.DB.$connect();
+
+    global.DB = this.DB;
+    
     return this.DB;
   }
 

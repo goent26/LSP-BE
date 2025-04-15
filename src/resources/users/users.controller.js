@@ -24,7 +24,7 @@ module.exports = {
   
   getOneById: catchAsync(async (req, res, next) => {
     // Get user id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Get user using service.
     const user = await service.getOneById(id);

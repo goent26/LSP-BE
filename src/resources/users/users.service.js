@@ -33,7 +33,7 @@ module.exports = {
     const findOptions = {
       where: { id },
       include: {
-        products: true,
+        pendaftaran: true,
       },
     };
 

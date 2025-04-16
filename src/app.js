@@ -14,7 +14,7 @@ async function createApp(database) {
   );
 
   // WARN: remove this after you solve db connection with service
-  global.DB = DB;
+
 
   // Create express app
   const app = express();

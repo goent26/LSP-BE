@@ -11,13 +11,6 @@ module.exports = {
     // Buat data peserta
     const profile_peserta = await DB.ProfileUser.create({ data: newData });
 
-    // Cek apakah skema_id valid (ada di database)
-    const checkSkema = await DB.Skema.findOne({ _id: skema_id });
-
-    if (!checkSkema) {
-      throw new Error(`Skema dengan ID ${skema_id} tidak ditemukan.`);
-    }
-
     // Jika valid, lanjut buat pendaftaran
     const pendaftaran = await DB.Pendaftaran.create({
       data:

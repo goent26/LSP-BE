@@ -1,4 +1,5 @@
 const service = require('./pendaftaran.service');
+const serviceSkema = require('../skema/skema.service');
 const { body, validationResult } = require("express-validator");
 const { catchAsync, AppError, JsonResponse } = require('../../utils');
 
@@ -19,6 +20,15 @@ module.exports = {
       body("no_telp").notEmpty().withMessage("Nomor telepon wajib diisi").run(req),
       body("skema_id").notEmpty().withMessage("Skema wajib diisi").run(req),
     ]);
+
+    // Check if skema exists using service.
+    const skema = await serviceSkema.isExist(reqBody.skema_id);
+    if (!skema) {
+      return new JsonResponse(res, 400)
+        .setMainContent(false, "Validasi gagal")
+        .setFailedPayload([{ msg: "Skema tidak ditemukan", param: "skema_id", location: "body" }])
+        .send();
+    }
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

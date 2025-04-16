@@ -20,18 +20,33 @@ enum Role {
 }
 
 model User {
-  id            String        @id @default(uuid())
+  id          String        @id @default(uuid())
+  username    String
+  email       String        @unique
+  password    String
+  role        Role
+  pendaftaran Pendaftaran[]
+  profile     ProfileUser?
+}
+
+model ProfileUser {
+  id            String    @id @default(uuid())
+  NIK           String?   @unique
+  no_registrasi String?   @unique
+  user_id       String    @unique
+  user          User      @relation(fields: [user_id], references: [id])
   nama_lengkap  String
-  email         String        @unique
-  password      String
   asal_sekolah  String?
   kompetensi    String?
+  PNS           String?
   masa_berlaku  DateTime?
-  role          Role
-  no_registrasi String?       @unique
-  no_telp       String?
+  kebangsaan    String?
+  tempat_lahir  String?
+  tanggal_lahir DateTime?
+  jenis_kelamin String?
   alamat        String?
-  pendaftaran   Pendaftaran[]
+  kode_pos      String?
+  no_telp       String?
 }
 
 enum JenisLSP {
@@ -60,43 +75,38 @@ enum StatusDaftar {
 
 model Pendaftaran {
   id                     String         @id @default(uuid())
-  no_registrasi          String         @unique
   status_daftar          StatusDaftar
   tanggal_daftar         DateTime
-  NIK                    String?        @unique
-  paspor                 String?        @unique
-  tempat_lahir           String?
-  tanggal_lahir          DateTime?
-  jenis_kelamin          String?
-  kebangsaan             String?
   catatan                String?
   kualifikasi_pendidikan String?
   tujuan_sertifikasi     String?
-  skema_id               String
-  skema                  Skema          @relation(fields: [skema_id], references: [id])
+  ttd_peserta            String?
+  ttd_asesor             String?
   user_id                String
   user                   User           @relation(fields: [user_id], references: [id])
+  skema_id               String
+  skema                  Skema          @relation(fields: [skema_id], references: [id])
+  jadwal_ujian_id        String?
+  jadwal_ujian           JadwalUjian?    @relation(fields: [jadwal_ujian_id], references: [id])
+  sertifikat             Sertifikat?
   lampiran_apl1          LampiranAPL1[]
   lampiran_apl2          LampiranAPL2[]
-  sertifikat             Sertifikat?
-  jadwal_ujian_id        String
-  jadwal_ujian           JadwalUjian    @relation(fields: [jadwal_ujian_id], references: [id])
 }
 
 enum StatusVerifikasi {
   memenuhi
+  pending
   tidak_memenuhi
-  tidak_ada
 }
 
 model LampiranAPL1 {
-  id                String           @id @default(uuid())
-  nama_dokumen      String
-  path_file         String
-  status_verifikasi StatusVerifikasi
+  id                String            @id @default(uuid())
+  nama_dokumen      String?
+  path_file         String?
+  status_verifikasi StatusVerifikasi?
   catatan           String?
   pendaftaran_id    String
-  pendaftaran       Pendaftaran      @relation(fields: [pendaftaran_id], references: [id])
+  pendaftaran       Pendaftaran       @relation(fields: [pendaftaran_id], references: [id])
 }
 
 enum StatusPreAsesmen {
@@ -105,41 +115,57 @@ enum StatusPreAsesmen {
 }
 
 model LampiranAPL2 {
-  id                 String           @id @default(uuid())
-  kode_unit          String
-  nama_unit          String
+  id                 String            @id @default(uuid())
   bukti_pendukung    String?
+  path_file          String?
   status_pre_asesmen StatusPreAsesmen
+  catatan            String?
+  status_verifikasi  StatusVerifikasi?
+  elemen_kuk_id      String
+  elemen_kuk         ElemenKUK         @relation(fields: [elemen_kuk_id], references: [id])
   pendaftaran_id     String
-  pendaftaran        Pendaftaran      @relation(fields: [pendaftaran_id], references: [id])
+  pendaftaran        Pendaftaran       @relation(fields: [pendaftaran_id], references: [id])
+}
+
+enum JenisSkema {
+  knni
+  okupasi
+  klaster
 }
 
 model Skema {
   id          String        @id @default(uuid())
+  judul_skema String
   nomor_skema String        @unique
-  nama        String
-  jenis       String
-  okupasi     String?
-  klaster     String?
+  jenis       JenisSkema
   pendaftaran Pendaftaran[]
   unit        Unit[]
-  JadwalUjian JadwalUjian[]
+  tuk         TUK[]
+}
+
+enum JenisStandar {
+  standar_khusus
+  standar_internasional
+  skkni
 }
 
 model Unit {
-  id         String      @id @default(uuid())
-  skema_id   String
-  judul_unit String
-  kode_unit  String      @unique
-  skema      Skema       @relation(fields: [skema_id], references: [id])
-  elemen_kuk ElemenKUK[]
+  id            String       @id @default(uuid())
+  judul_unit    String
+  kode_unit     String       @unique
+  jenis_standar JenisStandar
+  skema_id      String
+  skema         Skema        @relation(fields: [skema_id], references: [id])
+  elemen_kuk    ElemenKUK[]
 }
 
 model ElemenKUK {
-  id           String @id @default(uuid())
-  unit_id      String
+  id           String         @id @default(uuid())
   judul_elemen String
-  unit         Unit   @relation(fields: [unit_id], references: [id])
+  kuk          String
+  unit_id      String
+  unit         Unit           @relation(fields: [unit_id], references: [id])
+  LampiranAPL2 LampiranAPL2[]
 }
 
 enum JenisTUK {
@@ -155,19 +181,18 @@ model TUK {
   alamat      String
   jenis       JenisTUK
   JadwalUjian JadwalUjian[]
+  skema_id    String
+  skema       Skema         @relation(fields: [skema_id], references: [id])
 }
 
 model JadwalUjian {
   id            String        @id @default(uuid())
-  skema_id      String
   tuk_id        String
   tanggal_ujian DateTime
   keterangan    String?
-  // status        String // belum_dimulai, berlangsung, selesai
   kapasitas     Int           @default(24)
   waktu_mulai   DateTime      @default(now())
   waktu_selesai DateTime
-  skema         Skema         @relation(fields: [skema_id], references: [id])
   tuk           TUK           @relation(fields: [tuk_id], references: [id])
   peserta       Pendaftaran[]
 }
@@ -188,10 +213,10 @@ model JadwalUjian {
 // }
 
 model Sertifikat {
-  id             String      @id @default(uuid())
-  pendaftaran_id String      @unique
-  nomor_sert     String      @unique
-  tanggal_terbit DateTime
-  path_file      String?
-  pendaftaran    Pendaftaran @relation(fields: [pendaftaran_id], references: [id])
+  id               String      @id @default(uuid())
+  pendaftaran_id   String      @unique
+  nomor_sertifikat String      @unique
+  tanggal_terbit   DateTime
+  path_file        String?
+  pendaftaran      Pendaftaran @relation(fields: [pendaftaran_id], references: [id])
 }

@@ -10,7 +10,8 @@ const getDB = () => {
 module.exports = {
   async register(data) {
     const db = getDB();
-    const { username, email, password, role = 'pendaftar' } = data;
+    const { username, email, password } = data;
+    const role = 'peserta';
 
     // Check if user already exists
     const existingUser = await db.user.findUnique({ where: { email } });
@@ -25,7 +26,7 @@ module.exports = {
     const user = await db.user.create({
       data: {
         email,
-        nama_lengkap: username,
+        username,
         password: hashedPassword,
         role
       }

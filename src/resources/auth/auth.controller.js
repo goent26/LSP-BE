@@ -1,24 +1,32 @@
 const service = require('./auth.service');
+const { body, validationResult } = require('express-validator');
 const { catchAsync, AppError, JsonResponse } = require('../../utils');
 
 module.exports = {
   register: catchAsync(async (req, res) => {
-    // Validate role - hanya admin bisa membuat user dengan role selain pendaftar
-    // if (req.body.role && req.body.role !== 'pendaftar') {
-    //   if (!req.user || req.user.role !== 'admin') {
-    //     throw new AppError('Only admin can register non-pendaftar roles', 403);
-    //   }
-    // }
+    const data = req.body;
+    await Promise.all([
+      body("username").notEmpty().withMessage("Username wajib diisi").run(req),
+      body("email").isEmail().withMessage("Email tidak valid").notEmpty().withMessage("Email wajib diisi").run(req),
+      body("password").notEmpty().withMessage("Password wajib diisi").run(req),
+    ]);
 
-    const { username, email, password, role } = req.body;
-
-    if (!email || !password) {
-      throw new AppError('Please provide email and password', 400);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return new JsonResponse(res, 400)
+        .setMainContent(false, "Validasi gagal")
+        .setFailedPayload(errors.array())
+        .send();
     }
 
-    // const { user, token } = await service.login({ email, password });
+    if ('role' in req.body) {
+      return new JsonResponse(res, 400)
+        .setMainContent(false, "Validasi gagal")
+        .setFailedPayload([{ msg: "Anda tidak diizinkan menentukan role secara manual", param: "role", location: "body" }])
+        .send();
+    }
 
-    const { user, token } = await service.register({ username, email, password, role });
+    const { user, token } = await service.register(data);
 
     return new JsonResponse(res, 201)
       .setMainContent(true, 'User registered successfully')
@@ -27,13 +35,21 @@ module.exports = {
   }),
 
   login: catchAsync(async (req, res) => {
-    const { email, password } = req.body;
+    const data = req.body;
+    await Promise.all([
+      body("email").isEmail().withMessage("Email tidak valid").notEmpty().withMessage("Email wajib diisi").run(req),
+      body("password").notEmpty().withMessage("Password wajib diisi").run(req),
+    ]);
 
-    if (!email || !password) {
-      throw new AppError('Please provide email and password', 400);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return new JsonResponse(res, 400)
+        .setMainContent(false, "Validasi gagal")
+        .setFailedPayload(errors.array())
+        .send();
     }
 
-    const { user, token } = await service.login({ email, password });
+    const { user, token } = await service.login(data);
 
     return new JsonResponse(res, 200)
       .setMainContent(true, 'Login successful')

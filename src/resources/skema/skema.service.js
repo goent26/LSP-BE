@@ -79,13 +79,9 @@ module.exports = {
   },
 
   async isExist(id) {
-    // Create the find options object.
-    const findOptions = {
+    const skema = await DB.skema.findUnique({
       where: { id },
-    };
-
-    // Retrieve the skema.
-    const skema = await DB.skema.findUnique(findOptions);
+    });
 
     return !!skema;
   },

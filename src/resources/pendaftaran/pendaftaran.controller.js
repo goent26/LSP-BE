@@ -4,9 +4,9 @@ const { body, validationResult } = require("express-validator");
 const { catchAsync, AppError, JsonResponse } = require('../../utils');
 
 module.exports = {
-  // function post peserta
-  postPeserta: catchAsync(async (req, res) => {
-    const reqBody = req.body;
+  // function post pendaftaran apl 1
+  postPendaftaranApl1: catchAsync(async (req, res) => {
+    const data = req.body;
 
     await Promise.all([
       body("nama_lengkap").notEmpty().withMessage("Nama lengkap wajib diisi").run(req),
@@ -19,10 +19,11 @@ module.exports = {
       body("kode_pos").notEmpty().withMessage("Kode pos wajib diisi").run(req),
       body("no_telp").notEmpty().withMessage("Nomor telepon wajib diisi").run(req),
       body("skema_id").notEmpty().withMessage("Skema wajib diisi").run(req),
+      body("lampiran").isArray().withMessage("Lampiran wajib berupa array").run(req),
     ]);
 
-    // Check if skema exists using service.
-    const skema = await serviceSkema.isExist(reqBody.skema_id);
+    // Check if skema exists
+    const skema = await serviceSkema.isExist(data.skema_id);
     if (!skema) {
       return new JsonResponse(res, 400)
         .setMainContent(false, "Validasi gagal")
@@ -30,6 +31,7 @@ module.exports = {
         .send();
     }
 
+    // Validasi biodata
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return new JsonResponse(res, 400)
@@ -37,11 +39,12 @@ module.exports = {
         .setFailedPayload(errors.array())
         .send();
     }
-
-    const user = await service.postPeserta(reqBody);
+    
+    // insert data to service
+    const user = await service.postPendaftaranApl1(data);
 
     return new JsonResponse(res, 201)
-      .setMainContent(true, 'user created successfully')
+      .setMainContent(true, 'Pendaftaran APL 1 berhasil')
       .setSuccessPayload({ data: user })
       .send();
   }),

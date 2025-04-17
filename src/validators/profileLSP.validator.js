@@ -1,5 +1,5 @@
-const {body} = require('express-validator')
-const {JenisLSP} = require('@prisma/client')
+const { body } = require('express-validator')
+const { JenisLSP } = require('@prisma/client')
 const getDB = () => {
   if (!global.DB) throw new Error("Database not initialized");
   return global.DB;
@@ -29,25 +29,25 @@ const isUnique = (model, field, message) => {
 };
 const createProfileLSPValidator = () => [
   body('no_lisensi')
-  .notEmpty()
-  .withMessage('no lisensi wajib diisi')
-  .bail(),
+    .notEmpty()
+    .withMessage('no lisensi wajib diisi')
+    .bail(),
   isUnique('ProfileLSP', 'no_lisensi', 'No Lisensi sudah digunakan'),
 
   body("no_sk_lisensi")
-  .notEmpty()
-  .withMessage('no sk lisensi wajib diisi')
-  .bail(),
+    .notEmpty()
+    .withMessage('no sk lisensi wajib diisi')
+    .bail(),
   isUnique('ProfileLSP', 'no_sk_lisensi', 'No SK Lisensi sudah digunakan'),
 
   body("jenis")
-  .notEmpty()
-  .withMessage("jenis wajib diisi")
-  .isIn(allowJenisLSP)
-  .withMessage(`jenis harus salah satu dari ${allowJenisLSP.join(' ,')}`),
-  
+    .notEmpty()
+    .withMessage("jenis wajib diisi")
+    .isIn(allowJenisLSP)
+    .withMessage(`jenis harus salah satu dari ${allowJenisLSP.join(' ,')}`),
+
 ]
 
-module.exports ={
-createProfileLSPValidator,
+module.exports = {
+  createProfileLSPValidator,
 };

@@ -3,7 +3,7 @@ const controller = require('./pendaftaran.controller');
 
 const router = Router();
 
-router.post('/profile_peserta', controller.postPeserta);
+router.post('/apl1', controller.postPendaftaranApl1);
 // router.post('/profile_asesor', controller.postAsesor);
 // router.post('/apl1', controller.postApl1);
 // router.post('/apl2', controller.postApl2);

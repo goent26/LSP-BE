@@ -109,16 +109,15 @@ model LampiranAPL1 {
   pendaftaran       Pendaftaran       @relation(fields: [pendaftaran_id], references: [id])
 }
 
-enum StatusPreAsesmen {
+enum StatusPraAsesmen {
   kompeten
   belum_kompeten
 }
 
 model LampiranAPL2 {
   id                 String            @id @default(uuid())
-  bukti_pendukung    String?
   path_file          String?
-  status_pre_asesmen StatusPreAsesmen
+  status_pra_asesmen StatusPraAsesmen
   catatan            String?
   status_verifikasi  StatusVerifikasi?
   elemen_kuk_id      String

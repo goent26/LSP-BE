@@ -23,7 +23,6 @@
   - A unique constraint covering the columns `[nomor_sertifikat]` on the table `Sertifikat` will be added. If there are existing duplicate values, this will fail.
   - Added the required column `kuk` to the `ElemenKUK` table without a default value. This is not possible if the table is not empty.
   - Added the required column `pendaftaran_id` to the `LampiranAPL1` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `jadwal_ujian_id` to the `Pendaftaran` table without a default value. This is not possible if the table is not empty.
   - Added the required column `skema_id` to the `Pendaftaran` table without a default value. This is not possible if the table is not empty.
   - Changed the type of `status_daftar` on the `Pendaftaran` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
   - Added the required column `no_sk_lisensi` to the `ProfileLSP` table without a default value. This is not possible if the table is not empty.
@@ -51,7 +50,7 @@ CREATE TYPE "StatusDaftar" AS ENUM ('pending', 'diterima', 'ditolak');
 CREATE TYPE "StatusVerifikasi" AS ENUM ('memenuhi', 'pending', 'tidak_memenuhi');
 
 -- CreateEnum
-CREATE TYPE "StatusPreAsesmen" AS ENUM ('kompeten', 'belum_kompeten');
+CREATE TYPE "StatusPraAsesmen" AS ENUM ('kompeten', 'belum_kompeten');
 
 -- CreateEnum
 CREATE TYPE "JenisSkema" AS ENUM ('knni', 'okupasi', 'klaster');
@@ -113,7 +112,7 @@ ADD COLUMN     "status_verifikasi" "StatusVerifikasi";
 -- AlterTable
 ALTER TABLE "Pendaftaran" DROP COLUMN "no_registrasi",
 ADD COLUMN     "catatan" TEXT,
-ADD COLUMN     "jadwal_ujian_id" TEXT NOT NULL,
+ADD COLUMN     "jadwal_ujian_id" TEXT,
 ADD COLUMN     "kualifikasi_pendidikan" TEXT,
 ADD COLUMN     "skema_id" TEXT NOT NULL,
 ADD COLUMN     "ttd_asesor" TEXT,
@@ -174,8 +173,8 @@ DROP TABLE "PenjadwalanPeserta";
 -- CreateTable
 CREATE TABLE "ProfileUser" (
     "id" TEXT NOT NULL,
-    "NIK" TEXT NOT NULL,
-    "no_registrasi" TEXT NOT NULL,
+    "NIK" TEXT,
+    "no_registrasi" TEXT,
     "user_id" TEXT NOT NULL,
     "nama_lengkap" TEXT NOT NULL,
     "asal_sekolah" TEXT,
@@ -196,9 +195,8 @@ CREATE TABLE "ProfileUser" (
 -- CreateTable
 CREATE TABLE "LampiranAPL2" (
     "id" TEXT NOT NULL,
-    "bukti_pendukung" TEXT,
     "path_file" TEXT,
-    "status_pre_asesmen" "StatusPreAsesmen" NOT NULL,
+    "status_pra_asesmen" "StatusPraAsesmen" NOT NULL,
     "catatan" TEXT,
     "status_verifikasi" "StatusVerifikasi",
     "elemen_kuk_id" TEXT NOT NULL,
@@ -226,7 +224,7 @@ ALTER TABLE "ProfileUser" ADD CONSTRAINT "ProfileUser_user_id_fkey" FOREIGN KEY 
 ALTER TABLE "Pendaftaran" ADD CONSTRAINT "Pendaftaran_skema_id_fkey" FOREIGN KEY ("skema_id") REFERENCES "Skema"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Pendaftaran" ADD CONSTRAINT "Pendaftaran_jadwal_ujian_id_fkey" FOREIGN KEY ("jadwal_ujian_id") REFERENCES "JadwalUjian"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Pendaftaran" ADD CONSTRAINT "Pendaftaran_jadwal_ujian_id_fkey" FOREIGN KEY ("jadwal_ujian_id") REFERENCES "JadwalUjian"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "LampiranAPL1" ADD CONSTRAINT "LampiranAPL1_pendaftaran_id_fkey" FOREIGN KEY ("pendaftaran_id") REFERENCES "Pendaftaran"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -41,4 +41,36 @@ module.exports = {
       return { profile_peserta, pendaftaran, insertedLampiran };
     });
   },
+
+  async postPendaftaranApl2(data) {
+    const { lampiran, pendaftaran_id } = data;
+
+    return await DB.$transaction(async (tx) => {
+      // 1. Insert semua lampiran
+      const insertedLampiran = [];
+      for (const item of lampiran) {
+        const lampiranData = await tx.LampiranAPL2.create({
+          data: {
+            elemen_kuk_id : item.elemen_kuk_id,
+            path_file: item.path_file,
+            status_pra_asesmen: item.status_pra_asesmen,
+            status_verifikasi: "pending",
+            pendaftaran_id: pendaftaran_id,
+          },
+        });
+
+        insertedLampiran.push(lampiranData);
+      }
+
+      return { insertedLampiran };
+    });
+  },
+
+  async isExist(id) {
+    const pendaftaran = await DB.Pendaftaran.findUnique({
+      where: { id },
+    });
+
+    return !!pendaftaran;
+  },
 };

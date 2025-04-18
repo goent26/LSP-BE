@@ -31,7 +31,7 @@ module.exports = {
         .send();
     }
 
-    // Validasi biodata
+    // Validasi form
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return new JsonResponse(res, 400)
@@ -39,7 +39,7 @@ module.exports = {
         .setFailedPayload(errors.array())
         .send();
     }
-    
+
     // insert data to service
     const user = await service.postPendaftaranApl1(data);
 
@@ -49,13 +49,39 @@ module.exports = {
       .send();
   }),
 
-  // function post asesor
-
-
-  // function post apl1
-
-
   //function post apl2
+  postPendaftaranApl2: catchAsync(async (req, res) => {
+    const data = req.body;
 
+    await Promise.all([
+      body("pendaftaran_id").notEmpty().withMessage("Pendaftaran wajib diisi").run(req),
+      body("lampiran").isArray().withMessage("Lampiran wajib berupa array").run(req),
+    ]);
 
+    // Check if skema exists
+    const pendaftaran = await service.isExist(data.pendaftaran_id);
+    if (!pendaftaran) {
+      return new JsonResponse(res, 400)
+        .setMainContent(false, "Validasi gagal")
+        .setFailedPayload([{ msg: "Pendaftaran tidak ditemukan", param: "pendaftaran_id", location: "body" }])
+        .send();
+    }
+
+    // Validasi form
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return new JsonResponse(res, 400)
+        .setMainContent(false, "Validasi gagal")
+        .setFailedPayload(errors.array())
+        .send();
+    }
+
+    // insert data to service
+    const user = await service.postPendaftaranApl2(data);
+
+    return new JsonResponse(res, 201)
+      .setMainContent(true, 'Pendaftaran APL 2 berhasil')
+      .setSuccessPayload({ data: user })
+      .send();
+  }),
 };

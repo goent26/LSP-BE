@@ -20,8 +20,10 @@
   - You are about to drop the `APL2` table. If the table is not empty, all the data it contains will be lost.
   - You are about to drop the `APL2UnitKompetensi` table. If the table is not empty, all the data it contains will be lost.
   - You are about to drop the `PenjadwalanPeserta` table. If the table is not empty, all the data it contains will be lost.
+  - A unique constraint covering the columns `[asesor_id]` on the table `JadwalUjian` will be added. If there are existing duplicate values, this will fail.
   - A unique constraint covering the columns `[nomor_sertifikat]` on the table `Sertifikat` will be added. If there are existing duplicate values, this will fail.
   - Added the required column `kuk` to the `ElemenKUK` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `asesor_id` to the `JadwalUjian` table without a default value. This is not possible if the table is not empty.
   - Added the required column `pendaftaran_id` to the `LampiranAPL1` table without a default value. This is not possible if the table is not empty.
   - Added the required column `skema_id` to the `Pendaftaran` table without a default value. This is not possible if the table is not empty.
   - Changed the type of `status_daftar` on the `Pendaftaran` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
@@ -41,9 +43,6 @@
 CREATE TYPE "Role" AS ENUM ('admin', 'asesor', 'peserta');
 
 -- CreateEnum
-CREATE TYPE "JenisLSP" AS ENUM ('LSP_P1', 'LSP_P2', 'LSP_P3');
-
--- CreateEnum
 CREATE TYPE "StatusDaftar" AS ENUM ('pending', 'diterima', 'ditolak');
 
 -- CreateEnum
@@ -60,6 +59,15 @@ CREATE TYPE "JenisStandar" AS ENUM ('standar_khusus', 'standar_internasional', '
 
 -- CreateEnum
 CREATE TYPE "JenisTUK" AS ENUM ('sewaktu', 'tetap', 'mandiri');
+
+-- CreateEnum
+CREATE TYPE "Kehadiran" AS ENUM ('hadir', 'tidak_hadir');
+
+-- CreateEnum
+CREATE TYPE "StatusHasilUjian" AS ENUM ('lulus', 'tidak_lulus');
+
+-- CreateEnum
+CREATE TYPE "JenisLSP" AS ENUM ('LSP_P1', 'LSP_P2', 'LSP_P3');
 
 -- DropForeignKey
 ALTER TABLE "APL1" DROP CONSTRAINT "APL1_pendaftaran_id_fkey";
@@ -99,7 +107,8 @@ ALTER TABLE "ElemenKUK" ADD COLUMN     "kuk" TEXT NOT NULL;
 
 -- AlterTable
 ALTER TABLE "JadwalUjian" DROP COLUMN "skema_id",
-DROP COLUMN "status";
+DROP COLUMN "status",
+ADD COLUMN     "asesor_id" TEXT NOT NULL;
 
 -- AlterTable
 ALTER TABLE "LampiranAPL1" DROP COLUMN "apl1_id",
@@ -112,14 +121,14 @@ ADD COLUMN     "status_verifikasi" "StatusVerifikasi";
 -- AlterTable
 ALTER TABLE "Pendaftaran" DROP COLUMN "no_registrasi",
 ADD COLUMN     "catatan" TEXT,
-ADD COLUMN     "jadwal_ujian_id" TEXT,
 ADD COLUMN     "kualifikasi_pendidikan" TEXT,
 ADD COLUMN     "skema_id" TEXT NOT NULL,
 ADD COLUMN     "ttd_asesor" TEXT,
 ADD COLUMN     "ttd_peserta" TEXT,
 ADD COLUMN     "tujuan_sertifikasi" TEXT,
 DROP COLUMN "status_daftar",
-ADD COLUMN     "status_daftar" "StatusDaftar" NOT NULL;
+ADD COLUMN     "status_daftar" "StatusDaftar" NOT NULL,
+ALTER COLUMN "tanggal_daftar" SET DEFAULT CURRENT_TIMESTAMP;
 
 -- AlterTable
 ALTER TABLE "ProfileLSP" DROP COLUMN "no_ik_lisensi",
@@ -205,6 +214,30 @@ CREATE TABLE "LampiranAPL2" (
     CONSTRAINT "LampiranAPL2_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "JadwalUjianPendaftar" (
+    "id" TEXT NOT NULL,
+    "pendaftaran_id" TEXT NOT NULL,
+    "jadwal_id" TEXT NOT NULL,
+    "kehadiran" "Kehadiran" NOT NULL,
+    "nilai" TEXT NOT NULL,
+    "diskualifikasi" BOOLEAN NOT NULL,
+    "status_hasil_ujian" "StatusHasilUjian" NOT NULL,
+    "catatan" TEXT,
+
+    CONSTRAINT "JadwalUjianPendaftar_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "MUK" (
+    "id" TEXT NOT NULL,
+    "nama_muk" TEXT NOT NULL,
+    "deskripsi" TEXT NOT NULL,
+    "path_file" TEXT NOT NULL,
+
+    CONSTRAINT "MUK_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "ProfileUser_NIK_key" ON "ProfileUser"("NIK");
 
@@ -215,6 +248,12 @@ CREATE UNIQUE INDEX "ProfileUser_no_registrasi_key" ON "ProfileUser"("no_registr
 CREATE UNIQUE INDEX "ProfileUser_user_id_key" ON "ProfileUser"("user_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "JadwalUjianPendaftar_pendaftaran_id_key" ON "JadwalUjianPendaftar"("pendaftaran_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "JadwalUjian_asesor_id_key" ON "JadwalUjian"("asesor_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Sertifikat_nomor_sertifikat_key" ON "Sertifikat"("nomor_sertifikat");
 
 -- AddForeignKey
@@ -222,9 +261,6 @@ ALTER TABLE "ProfileUser" ADD CONSTRAINT "ProfileUser_user_id_fkey" FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE "Pendaftaran" ADD CONSTRAINT "Pendaftaran_skema_id_fkey" FOREIGN KEY ("skema_id") REFERENCES "Skema"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Pendaftaran" ADD CONSTRAINT "Pendaftaran_jadwal_ujian_id_fkey" FOREIGN KEY ("jadwal_ujian_id") REFERENCES "JadwalUjian"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "LampiranAPL1" ADD CONSTRAINT "LampiranAPL1_pendaftaran_id_fkey" FOREIGN KEY ("pendaftaran_id") REFERENCES "Pendaftaran"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -237,3 +273,12 @@ ALTER TABLE "LampiranAPL2" ADD CONSTRAINT "LampiranAPL2_pendaftaran_id_fkey" FOR
 
 -- AddForeignKey
 ALTER TABLE "TUK" ADD CONSTRAINT "TUK_skema_id_fkey" FOREIGN KEY ("skema_id") REFERENCES "Skema"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JadwalUjianPendaftar" ADD CONSTRAINT "JadwalUjianPendaftar_pendaftaran_id_fkey" FOREIGN KEY ("pendaftaran_id") REFERENCES "Pendaftaran"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JadwalUjianPendaftar" ADD CONSTRAINT "JadwalUjianPendaftar_jadwal_id_fkey" FOREIGN KEY ("jadwal_id") REFERENCES "JadwalUjian"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JadwalUjian" ADD CONSTRAINT "JadwalUjian_asesor_id_fkey" FOREIGN KEY ("asesor_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

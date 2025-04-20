@@ -1,3 +1,4 @@
+const tuk = require('../resources/tuk');
 const elemen_kuk = require('../resources/elemen_kuk');
 const unit = require('../resources/unit');
 const skema = require('../resources/skema');
@@ -13,6 +14,7 @@ module.exports = (app) => {
   app.use('/api', skema.routes);
   app.use('/api', unit.routes);
   app.use('/api', elemen_kuk.routes);
+  app.use('/api', tuk.routes);
 
   app.use('/profile-lsp', profileLSP.routes);
 

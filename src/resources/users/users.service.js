@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+
 const getDB = () => {
   if (!global.DB) throw new Error("Database not initialized");
   return global.DB;
@@ -10,7 +12,7 @@ module.exports = {
     // Create the find options object.
     const findOptions = {
       include: {
-        // products: true,
+        profile: true,
       },
     };
 
@@ -33,7 +35,7 @@ module.exports = {
     const findOptions = {
       where: { id },
       include: {
-        pendaftaran: true,
+        profile: true,
       },
     };
 
@@ -44,8 +46,20 @@ module.exports = {
   },
 
   async createOne(data) {
+    const { username, email, password, role } = data;
+    
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     // Create the user.
-    const user = await DB.user.create({ data });
+    const user = await DB.user.create({
+      data: {
+        email, 
+        username,
+        password: hashedPassword,
+        role
+      }
+    });
 
     return user;
   },

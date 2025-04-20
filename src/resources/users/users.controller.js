@@ -78,6 +78,20 @@ module.exports = {
 
     // Get data from request body.
     const data = req.body;
+    await Promise.all([
+      body("username").notEmpty().withMessage("Username wajib diisi").run(req),
+      body("email").isEmail().withMessage("Email tidak valid").notEmpty().withMessage("Email wajib diisi").run(req),
+      body("password").notEmpty().withMessage("Password wajib diisi").run(req),
+      body("role").isIn(["asesor", "peserta"]).withMessage("Role tidak valid").run(req)
+    ]);
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return new JsonResponse(res, 400)
+        .setMainContent(false, "Validasi gagal")
+        .setFailedPayload(errors.array())
+        .send();
+    }
 
     // update user using service
     const user = await service.updateOneById(id, data);
@@ -87,7 +101,7 @@ module.exports = {
 
     // Send success response
     return new JsonResponse(res, 200)
-      .setMainContent(true, 'user updated successfully')
+      .setMainContent(true, `user ${data.role} updated successfully`)
       .setSuccessPayload({
         data: user,
       })

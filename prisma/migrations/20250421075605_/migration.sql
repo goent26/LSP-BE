@@ -3,6 +3,7 @@
 
   - You are about to drop the column `skema_id` on the `JadwalUjian` table. All the data in the column will be lost.
   - You are about to drop the column `status` on the `JadwalUjian` table. All the data in the column will be lost.
+  - You are about to drop the column `tanggal_ujian` on the `JadwalUjian` table. All the data in the column will be lost.
   - You are about to drop the column `apl1_id` on the `LampiranAPL1` table. All the data in the column will be lost.
   - The `status_verifikasi` column on the `LampiranAPL1` table would be dropped and recreated. This will lead to data loss if there is data in the column.
   - You are about to drop the column `no_registrasi` on the `Pendaftaran` table. All the data in the column will be lost.
@@ -21,9 +22,11 @@
   - You are about to drop the `APL2UnitKompetensi` table. If the table is not empty, all the data it contains will be lost.
   - You are about to drop the `PenjadwalanPeserta` table. If the table is not empty, all the data it contains will be lost.
   - A unique constraint covering the columns `[asesor_id]` on the table `JadwalUjian` will be added. If there are existing duplicate values, this will fail.
+  - A unique constraint covering the columns `[user_id]` on the table `Pendaftaran` will be added. If there are existing duplicate values, this will fail.
   - A unique constraint covering the columns `[nomor_sertifikat]` on the table `Sertifikat` will be added. If there are existing duplicate values, this will fail.
   - Added the required column `kuk` to the `ElemenKUK` table without a default value. This is not possible if the table is not empty.
   - Added the required column `asesor_id` to the `JadwalUjian` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `durasi` to the `JadwalUjian` table without a default value. This is not possible if the table is not empty.
   - Added the required column `pendaftaran_id` to the `LampiranAPL1` table without a default value. This is not possible if the table is not empty.
   - Added the required column `skema_id` to the `Pendaftaran` table without a default value. This is not possible if the table is not empty.
   - Changed the type of `status_daftar` on the `Pendaftaran` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
@@ -64,7 +67,7 @@ CREATE TYPE "JenisTUK" AS ENUM ('sewaktu', 'tetap', 'mandiri');
 CREATE TYPE "Kehadiran" AS ENUM ('hadir', 'tidak_hadir');
 
 -- CreateEnum
-CREATE TYPE "StatusHasilUjian" AS ENUM ('lulus', 'tidak_lulus');
+CREATE TYPE "StatusHasilUjian" AS ENUM ('lulus', 'pending', 'tidak_lulus');
 
 -- CreateEnum
 CREATE TYPE "JenisLSP" AS ENUM ('LSP_P1', 'LSP_P2', 'LSP_P3');
@@ -108,7 +111,10 @@ ALTER TABLE "ElemenKUK" ADD COLUMN     "kuk" TEXT NOT NULL;
 -- AlterTable
 ALTER TABLE "JadwalUjian" DROP COLUMN "skema_id",
 DROP COLUMN "status",
-ADD COLUMN     "asesor_id" TEXT NOT NULL;
+DROP COLUMN "tanggal_ujian",
+ADD COLUMN     "asesor_id" TEXT NOT NULL,
+ADD COLUMN     "durasi" INTEGER NOT NULL,
+ALTER COLUMN "kapasitas" DROP NOT NULL;
 
 -- AlterTable
 ALTER TABLE "LampiranAPL1" DROP COLUMN "apl1_id",
@@ -219,10 +225,10 @@ CREATE TABLE "JadwalUjianPendaftar" (
     "id" TEXT NOT NULL,
     "pendaftaran_id" TEXT NOT NULL,
     "jadwal_id" TEXT NOT NULL,
-    "kehadiran" "Kehadiran" NOT NULL,
-    "nilai" TEXT NOT NULL,
-    "diskualifikasi" BOOLEAN NOT NULL,
-    "status_hasil_ujian" "StatusHasilUjian" NOT NULL,
+    "kehadiran" "Kehadiran",
+    "nilai" TEXT,
+    "diskualifikasi" BOOLEAN NOT NULL DEFAULT false,
+    "status_hasil_ujian" "StatusHasilUjian" NOT NULL DEFAULT 'pending',
     "catatan" TEXT,
 
     CONSTRAINT "JadwalUjianPendaftar_pkey" PRIMARY KEY ("id")
@@ -252,6 +258,9 @@ CREATE UNIQUE INDEX "JadwalUjianPendaftar_pendaftaran_id_key" ON "JadwalUjianPen
 
 -- CreateIndex
 CREATE UNIQUE INDEX "JadwalUjian_asesor_id_key" ON "JadwalUjian"("asesor_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Pendaftaran_user_id_key" ON "Pendaftaran"("user_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Sertifikat_nomor_sertifikat_key" ON "Sertifikat"("nomor_sertifikat");

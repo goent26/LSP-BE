@@ -20,12 +20,12 @@ enum Role {
 }
 
 model User {
-  id          String        @id @default(uuid())
+  id          String       @id @default(uuid())
   username    String
-  email       String        @unique
+  email       String       @unique
   password    String
   role        Role
-  pendaftaran Pendaftaran[]
+  pendaftaran Pendaftaran?
   profile     ProfileUser?
   JadwalUjian JadwalUjian?
 }
@@ -65,7 +65,7 @@ model Pendaftaran {
   tujuan_sertifikasi     String?
   ttd_peserta            String?
   ttd_asesor             String?
-  user_id                String
+  user_id                String                @unique
   user                   User                  @relation(fields: [user_id], references: [id])
   skema_id               String
   skema                  Skema                 @relation(fields: [skema_id], references: [id])
@@ -173,6 +173,7 @@ enum Kehadiran {
 
 enum StatusHasilUjian {
   lulus
+  pending
   tidak_lulus
 }
 
@@ -180,10 +181,10 @@ model JadwalUjianPendaftar {
   id                 String           @id @default(uuid())
   pendaftaran_id     String           @unique
   jadwal_id          String
-  kehadiran          Kehadiran
-  nilai              String
-  diskualifikasi     Boolean
-  status_hasil_ujian StatusHasilUjian
+  kehadiran          Kehadiran?
+  nilai              String?
+  diskualifikasi     Boolean          @default(false)
+  status_hasil_ujian StatusHasilUjian @default(pending)
   catatan            String?
   pendaftaran        Pendaftaran      @relation(fields: [pendaftaran_id], references: [id])
   jadwal_ujian       JadwalUjian      @relation(fields: [jadwal_id], references: [id])
@@ -193,11 +194,11 @@ model JadwalUjian {
   id                   String                 @id @default(uuid())
   tuk_id               String
   asesor_id            String                 @unique
-  tanggal_ujian        DateTime
   keterangan           String?
-  kapasitas            Int                    @default(24)
+  kapasitas            Int?                   @default(24)
   waktu_mulai          DateTime               @default(now())
   waktu_selesai        DateTime
+  durasi               Int
   tuk                  TUK                    @relation(fields: [tuk_id], references: [id])
   asesor               User                   @relation(fields: [asesor_id], references: [id])
   JadwalUjianPendaftar JadwalUjianPendaftar[]
@@ -213,7 +214,7 @@ model Sertifikat {
 }
 
 model MUK {
-  id        String  @id @default(uuid())
+  id        String @id @default(uuid())
   nama_muk  String
   deskripsi String
   path_file String

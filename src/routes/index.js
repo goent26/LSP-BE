@@ -7,6 +7,7 @@ const pendaftaran = require('../resources/pendaftaran');
 const users = require('../resources/users');
 const auth = require('../resources/auth');
 const profileLSP = require('../resources/profile-LSP');
+const profileUser = require('../resources/profile-user');
 
 module.exports = (app) => {
   app.use('/api', users.routes);
@@ -17,8 +18,8 @@ module.exports = (app) => {
   app.use('/api', elemen_kuk.routes);
   app.use('/api', tuk.routes);
   app.use('/api', jadwal.routes);
-
-  app.use('/profile-lsp', profileLSP.routes);
+  app.use('/api', profileUser.routes);
+  app.use('/api', profileLSP.routes);
 
   // app.use('/', (req, res, next) => {
   //    res.status(200).json({

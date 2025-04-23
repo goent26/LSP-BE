@@ -1,5 +1,3 @@
-const { updateOneById } = require("../users/users.service");
-
 const getDB = () => {
   if (!global.DB) throw new Error("Database not initialized");
   return global.DB;

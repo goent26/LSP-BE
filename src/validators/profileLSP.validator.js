@@ -1,33 +1,9 @@
 const { body } = require('express-validator')
 const { JenisLSP } = require('@prisma/client')
-const getDB = () => {
-  if (!global.DB) throw new Error("Database not initialized");
-  return global.DB;
-};
-
+const { isUnique } = require('./helper.validator')
 const allowJenisLSP = Object.values(JenisLSP)
 
-const isUnique = (model, field, message) => {
-  return body(field).custom(async (value, { req }) => {
-    if (!value) {
-      throw new Error(`${field} is required`);
-    }
-    console.log('Custom validator received value:', value);
-    console.log('Request body inside custom validator:', req.body);
-
-    const DB = getDB();
-    const record = await DB[model].findFirst({
-      where: { [field]: value },
-    });
-
-    if (record) {
-      throw new Error(message || `${field} sudah digunakan`);
-    }
-
-    return true;
-  });
-};
-const createProfileLSPValidator = () => [
+const profileLSPValidator = () => [
   body('no_lisensi')
     .notEmpty()
     .withMessage('no lisensi wajib diisi')
@@ -49,5 +25,5 @@ const createProfileLSPValidator = () => [
 ]
 
 module.exports = {
-  createProfileLSPValidator,
+  profileLSPValidator,
 };

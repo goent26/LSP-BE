@@ -9,6 +9,7 @@ const getDB = () => {
 
 module.exports = {
   async register(data) {
+    const db = getDB();
     const { username, email, password } = data;
     const role = 'peserta';
 

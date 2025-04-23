@@ -7,6 +7,7 @@ module.exports = {
   // function post pendaftaran apl 1
   postPendaftaranApl1: catchAsync(async (req, res) => {
     const data = req.body;
+    const userId = req.user.id;
 
     await Promise.all([
       body("nama_lengkap").notEmpty().withMessage("Nama lengkap wajib diisi").run(req),
@@ -41,7 +42,7 @@ module.exports = {
     }
 
     // insert data to service
-    const user = await service.postPendaftaranApl1(data);
+    const user = await service.postPendaftaranApl1(userId, data);
 
     return new JsonResponse(res, 201)
       .setMainContent(true, 'Pendaftaran APL 1 berhasil')

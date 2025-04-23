@@ -4,7 +4,7 @@ const getDB = () => {
 };
 
 module.exports = {
-  async postPendaftaranApl1(data) {
+  async postPendaftaranApl1(userId, data) {
     const { lampiran, skema_id, ...newData } = data;
 
     return await DB.$transaction(async (tx) => {
@@ -18,7 +18,7 @@ module.exports = {
         data: {
           status_daftar: "pending",
           tanggal_daftar: new Date(),
-          user_id: newData.user_id,
+          user_id: userId,
           skema_id: skema_id,
         },
       });

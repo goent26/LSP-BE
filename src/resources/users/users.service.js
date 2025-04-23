@@ -30,7 +30,7 @@ module.exports = {
     return users;
   },
 
-  async getOneById(id) {
+  async getOneById(id, filter) {
     // Create the find options object.
     const findOptions = {
       where: { id },
@@ -38,6 +38,9 @@ module.exports = {
         profile: true,
       },
     };
+
+    // Add the filter to the find options.
+    if (filter) findOptions.where = { ...findOptions.where, ...filter };
 
     // Retrieve the user.
     const user = await DB.user.findUnique(findOptions);
@@ -47,14 +50,14 @@ module.exports = {
 
   async createOne(data) {
     const { username, email, password, role } = data;
-    
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create the user.
     const user = await DB.user.create({
       data: {
-        email, 
+        email,
         username,
         password: hashedPassword,
         role

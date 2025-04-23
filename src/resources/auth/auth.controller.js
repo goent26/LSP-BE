@@ -17,9 +17,8 @@ module.exports = {
         .setMainContent(false, "Validasi gagal")
         .setFailedPayload(errors.array())
         .send();
-    }yield
+    }
     
-
     if ('role' in req.body) {
       return new JsonResponse(res, 400)
         .setMainContent(false, "Validasi gagal")

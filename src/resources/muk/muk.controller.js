@@ -47,7 +47,7 @@ module.exports = {
 
     await Promise.all([
       body("nama_muk").notEmpty().withMessage("Nama muk wajib diisi").run(req),
-      body("deskripsi").notEmpty().withMessage("Kode muk wajib diisi").run(req),
+      body("deskripsi").notEmpty().withMessage("Deskripsi wajib diisi").run(req),
       body("path_file").notEmpty().withMessage("File wajib diisi").run(req),
     ]);
 
@@ -80,7 +80,7 @@ module.exports = {
 
     await Promise.all([
       body("nama_muk").notEmpty().withMessage("Nama muk wajib diisi").run(req),
-      body("deskripsi").notEmpty().withMessage("Kode muk wajib diisi").run(req),
+      body("deskripsi").notEmpty().withMessage("Deskripsi wajib diisi").run(req),
       body("path_file").notEmpty().withMessage("File wajib diisi").run(req),
     ]);
 

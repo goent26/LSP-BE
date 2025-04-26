@@ -20,14 +20,16 @@ enum Role {
 }
 
 model User {
-  id          String       @id @default(uuid())
+  id          String        @id @default(uuid())
   username    String
-  email       String       @unique
+  email       String        @unique
   password    String
   role        Role
   pendaftaran Pendaftaran?
   profile     ProfileUser?
-  JadwalUjian JadwalUjian?
+  JadwalUjian JadwalUjian[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model ProfileUser {
@@ -48,6 +50,8 @@ model ProfileUser {
   alamat        String?
   kode_pos      String?
   no_telp       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 enum StatusDaftar {
@@ -73,6 +77,8 @@ model Pendaftaran {
   lampiran_apl1          LampiranAPL1[]
   lampiran_apl2          LampiranAPL2[]
   JadwalUjianPendaftar   JadwalUjianPendaftar?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
 }
 
 enum StatusVerifikasi {
@@ -89,6 +95,8 @@ model LampiranAPL1 {
   catatan           String?
   pendaftaran_id    String
   pendaftaran       Pendaftaran       @relation(fields: [pendaftaran_id], references: [id])
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 }
 
 enum StatusPraAsesmen {
@@ -106,6 +114,8 @@ model LampiranAPL2 {
   elemen_kuk         ElemenKUK         @relation(fields: [elemen_kuk_id], references: [id])
   pendaftaran_id     String
   pendaftaran        Pendaftaran       @relation(fields: [pendaftaran_id], references: [id])
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
 }
 
 enum JenisSkema {
@@ -122,6 +132,8 @@ model Skema {
   pendaftaran Pendaftaran[]
   unit        Unit[]
   tuk         TUK[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 enum JenisStandar {
@@ -147,6 +159,8 @@ model ElemenKUK {
   unit_id      String
   unit         Unit           @relation(fields: [unit_id], references: [id])
   LampiranAPL2 LampiranAPL2[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
 }
 
 enum JenisTUK {
@@ -164,6 +178,8 @@ model TUK {
   JadwalUjian JadwalUjian[]
   skema_id    String
   skema       Skema         @relation(fields: [skema_id], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 enum Kehadiran {
@@ -188,12 +204,14 @@ model JadwalUjianPendaftar {
   catatan            String?
   pendaftaran        Pendaftaran      @relation(fields: [pendaftaran_id], references: [id])
   jadwal_ujian       JadwalUjian      @relation(fields: [jadwal_id], references: [id])
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
 }
 
 model JadwalUjian {
   id                   String                 @id @default(uuid())
   tuk_id               String
-  asesor_id            String                 @unique
+  asesor_id            String
   keterangan           String?
   kapasitas            Int?                   @default(24)
   waktu_mulai          DateTime               @default(now())
@@ -202,6 +220,8 @@ model JadwalUjian {
   tuk                  TUK                    @relation(fields: [tuk_id], references: [id])
   asesor               User                   @relation(fields: [asesor_id], references: [id])
   JadwalUjianPendaftar JadwalUjianPendaftar[]
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
 }
 
 model Sertifikat {
@@ -211,13 +231,17 @@ model Sertifikat {
   tanggal_terbit   DateTime
   path_file        String?
   pendaftaran      Pendaftaran @relation(fields: [pendaftaran_id], references: [id])
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
 }
 
 model MUK {
-  id        String @id @default(uuid())
+  id        String   @id @default(uuid())
   nama_muk  String
   deskripsi String
   path_file String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum JenisLSP {
@@ -227,13 +251,16 @@ enum JenisLSP {
 }
 
 model ProfileLSP {
-  id            String   @id @default(uuid())
+  id            String    @id @default(uuid())
   no_sk_lisensi String
   no_lisensi    String
   jenis         JenisLSP
+  masa_berlaku  DateTime?
   alamat        String?
   website_link  String?
   no_fax        String?
   no_hp         String?
   email         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }

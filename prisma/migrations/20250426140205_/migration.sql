@@ -21,23 +21,31 @@
   - You are about to drop the `APL2` table. If the table is not empty, all the data it contains will be lost.
   - You are about to drop the `APL2UnitKompetensi` table. If the table is not empty, all the data it contains will be lost.
   - You are about to drop the `PenjadwalanPeserta` table. If the table is not empty, all the data it contains will be lost.
-  - A unique constraint covering the columns `[asesor_id]` on the table `JadwalUjian` will be added. If there are existing duplicate values, this will fail.
   - A unique constraint covering the columns `[user_id]` on the table `Pendaftaran` will be added. If there are existing duplicate values, this will fail.
   - A unique constraint covering the columns `[nomor_sertifikat]` on the table `Sertifikat` will be added. If there are existing duplicate values, this will fail.
   - Added the required column `kuk` to the `ElemenKUK` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `updatedAt` to the `ElemenKUK` table without a default value. This is not possible if the table is not empty.
   - Added the required column `asesor_id` to the `JadwalUjian` table without a default value. This is not possible if the table is not empty.
   - Added the required column `durasi` to the `JadwalUjian` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `updatedAt` to the `JadwalUjian` table without a default value. This is not possible if the table is not empty.
   - Added the required column `pendaftaran_id` to the `LampiranAPL1` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `updatedAt` to the `LampiranAPL1` table without a default value. This is not possible if the table is not empty.
   - Added the required column `skema_id` to the `Pendaftaran` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `updatedAt` to the `Pendaftaran` table without a default value. This is not possible if the table is not empty.
   - Changed the type of `status_daftar` on the `Pendaftaran` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
   - Added the required column `no_sk_lisensi` to the `ProfileLSP` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `updatedAt` to the `ProfileLSP` table without a default value. This is not possible if the table is not empty.
   - Changed the type of `jenis` on the `ProfileLSP` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
   - Added the required column `nomor_sertifikat` to the `Sertifikat` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `updatedAt` to the `Sertifikat` table without a default value. This is not possible if the table is not empty.
   - Added the required column `judul_skema` to the `Skema` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `updatedAt` to the `Skema` table without a default value. This is not possible if the table is not empty.
   - Changed the type of `jenis` on the `Skema` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
   - Added the required column `skema_id` to the `TUK` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `updatedAt` to the `TUK` table without a default value. This is not possible if the table is not empty.
   - Changed the type of `jenis` on the `TUK` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
   - Added the required column `jenis_standar` to the `Unit` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `updatedAt` to the `User` table without a default value. This is not possible if the table is not empty.
   - Added the required column `username` to the `User` table without a default value. This is not possible if the table is not empty.
   - Changed the type of `role` on the `User` table. No cast exists, the column would be dropped and recreated, which cannot be done if there is data, since the column is required.
 
@@ -106,19 +114,25 @@ DROP INDEX "User_NIK_key";
 DROP INDEX "User_no_registrasi_key";
 
 -- AlterTable
-ALTER TABLE "ElemenKUK" ADD COLUMN     "kuk" TEXT NOT NULL;
+ALTER TABLE "ElemenKUK" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "kuk" TEXT NOT NULL,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL;
 
 -- AlterTable
 ALTER TABLE "JadwalUjian" DROP COLUMN "skema_id",
 DROP COLUMN "status",
 DROP COLUMN "tanggal_ujian",
 ADD COLUMN     "asesor_id" TEXT NOT NULL,
+ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN     "durasi" INTEGER NOT NULL,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL,
 ALTER COLUMN "kapasitas" DROP NOT NULL;
 
 -- AlterTable
 ALTER TABLE "LampiranAPL1" DROP COLUMN "apl1_id",
+ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN     "pendaftaran_id" TEXT NOT NULL,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL,
 ALTER COLUMN "nama_dokumen" DROP NOT NULL,
 ALTER COLUMN "path_file" DROP NOT NULL,
 DROP COLUMN "status_verifikasi",
@@ -127,11 +141,13 @@ ADD COLUMN     "status_verifikasi" "StatusVerifikasi";
 -- AlterTable
 ALTER TABLE "Pendaftaran" DROP COLUMN "no_registrasi",
 ADD COLUMN     "catatan" TEXT,
+ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN     "kualifikasi_pendidikan" TEXT,
 ADD COLUMN     "skema_id" TEXT NOT NULL,
 ADD COLUMN     "ttd_asesor" TEXT,
 ADD COLUMN     "ttd_peserta" TEXT,
 ADD COLUMN     "tujuan_sertifikasi" TEXT,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL,
 DROP COLUMN "status_daftar",
 ADD COLUMN     "status_daftar" "StatusDaftar" NOT NULL,
 ALTER COLUMN "tanggal_daftar" SET DEFAULT CURRENT_TIMESTAMP;
@@ -139,24 +155,33 @@ ALTER COLUMN "tanggal_daftar" SET DEFAULT CURRENT_TIMESTAMP;
 -- AlterTable
 ALTER TABLE "ProfileLSP" DROP COLUMN "no_ik_lisensi",
 ADD COLUMN     "alamat" TEXT,
+ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "masa_berlaku" TIMESTAMP(3),
 ADD COLUMN     "no_sk_lisensi" TEXT NOT NULL,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL,
 DROP COLUMN "jenis",
 ADD COLUMN     "jenis" "JenisLSP" NOT NULL;
 
 -- AlterTable
 ALTER TABLE "Sertifikat" DROP COLUMN "nomor_sert",
-ADD COLUMN     "nomor_sertifikat" TEXT NOT NULL;
+ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "nomor_sertifikat" TEXT NOT NULL,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL;
 
 -- AlterTable
 ALTER TABLE "Skema" DROP COLUMN "klaster",
 DROP COLUMN "nama",
 DROP COLUMN "okupasi",
+ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 ADD COLUMN     "judul_skema" TEXT NOT NULL,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL,
 DROP COLUMN "jenis",
 ADD COLUMN     "jenis" "JenisSkema" NOT NULL;
 
 -- AlterTable
-ALTER TABLE "TUK" ADD COLUMN     "skema_id" TEXT NOT NULL,
+ALTER TABLE "TUK" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "skema_id" TEXT NOT NULL,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL,
 DROP COLUMN "jenis",
 ADD COLUMN     "jenis" "JenisTUK" NOT NULL;
 
@@ -169,6 +194,8 @@ DROP COLUMN "alamat",
 DROP COLUMN "nama_lengkap",
 DROP COLUMN "no_registrasi",
 DROP COLUMN "no_telp",
+ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "updatedAt" TIMESTAMP(3) NOT NULL,
 ADD COLUMN     "username" TEXT NOT NULL,
 DROP COLUMN "role",
 ADD COLUMN     "role" "Role" NOT NULL;
@@ -203,6 +230,8 @@ CREATE TABLE "ProfileUser" (
     "alamat" TEXT,
     "kode_pos" TEXT,
     "no_telp" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "ProfileUser_pkey" PRIMARY KEY ("id")
 );
@@ -216,6 +245,8 @@ CREATE TABLE "LampiranAPL2" (
     "status_verifikasi" "StatusVerifikasi",
     "elemen_kuk_id" TEXT NOT NULL,
     "pendaftaran_id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "LampiranAPL2_pkey" PRIMARY KEY ("id")
 );
@@ -230,6 +261,8 @@ CREATE TABLE "JadwalUjianPendaftar" (
     "diskualifikasi" BOOLEAN NOT NULL DEFAULT false,
     "status_hasil_ujian" "StatusHasilUjian" NOT NULL DEFAULT 'pending',
     "catatan" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "JadwalUjianPendaftar_pkey" PRIMARY KEY ("id")
 );
@@ -240,6 +273,8 @@ CREATE TABLE "MUK" (
     "nama_muk" TEXT NOT NULL,
     "deskripsi" TEXT NOT NULL,
     "path_file" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "MUK_pkey" PRIMARY KEY ("id")
 );
@@ -255,9 +290,6 @@ CREATE UNIQUE INDEX "ProfileUser_user_id_key" ON "ProfileUser"("user_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "JadwalUjianPendaftar_pendaftaran_id_key" ON "JadwalUjianPendaftar"("pendaftaran_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "JadwalUjian_asesor_id_key" ON "JadwalUjian"("asesor_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Pendaftaran_user_id_key" ON "Pendaftaran"("user_id");

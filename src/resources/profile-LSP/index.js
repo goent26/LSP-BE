@@ -5,7 +5,7 @@ const { Router } = require('express');
 const { verifyToken, restrictTo } = require('../../middlewares/auth');
 
 const routes = Router();
-routes.use( '/profile-lsp', verifyToken, restrictTo('admin'), router);
+routes.use( '/profile-lsp', router);
 
 module.exports = {
   service,

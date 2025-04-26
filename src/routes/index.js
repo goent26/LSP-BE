@@ -1,3 +1,4 @@
+const sertifikasi = require('../resources/sertifikasi');
 const jadwal = require('../resources/jadwal_ujian');
 const tuk = require('../resources/tuk');
 const elemen_kuk = require('../resources/elemen_kuk');
@@ -18,6 +19,7 @@ module.exports = (app) => {
   app.use('/api', elemen_kuk.routes);
   app.use('/api', tuk.routes);
   app.use('/api', jadwal.routes);
+  app.use('/api', sertifikasi.routes);
   app.use('/api', profileUser.routes);
   app.use('/api', profileLSP.routes);
 

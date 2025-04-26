@@ -47,7 +47,7 @@ module.exports = {
 
     return await DB.$transaction(async (tx) => {
       // 1. Buat Jadwal Ujian
-      const jadwal_ujian = await tx.JadwalUjian.create({
+      const jadwalUjian = await tx.JadwalUjian.create({
         data: {
           ...newData,
           waktu_mulai: waktuMulaiDate,
@@ -62,11 +62,11 @@ module.exports = {
       const insertedJadwalUjianPendaftar = [];
       for (const id of pendaftaran_id) {
         console.log("id pendaftaran: ", id);
-        console.log("id jadwal ujian: ", jadwal_ujian.id);
+        console.log("id jadwal ujian: ", jadwalUjian.id);
         
         const jadwalUjianPendaftarData = await tx.JadwalUjianPendaftar.create({
           data: {
-            jadwal_ujian_id: jadwal_ujian.id,
+            jadwal_id: jadwalUjian.id,
             pendaftaran_id: id,
             diskualifikasi: false,
             status_hasil_ujian: "pending",
@@ -76,7 +76,7 @@ module.exports = {
         insertedJadwalUjianPendaftar.push(jadwalUjianPendaftarData);
       }
 
-      return { profile_peserta, jadwal_ujian, insertedJadwalUjianPendaftar };
+      return { jadwalUjian, insertedJadwalUjianPendaftar };
       
     });
   },

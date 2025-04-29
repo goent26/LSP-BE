@@ -10,7 +10,10 @@ module.exports = {
     return await DB.$transaction(async (tx) => {
       // 1. Buat Profile Peserta
       const profile_peserta = await tx.ProfileUser.create({
-        data: newData,
+        data: {
+          ...newData,
+          user_id: userId,
+        },
       });
 
       // 2. Buat Pendaftaran

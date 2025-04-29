@@ -25,7 +25,7 @@ module.exports = {
 
   getOneById: catchAsync(async (req, res, next) => {
     // Get skema id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Get skema using service.
     const skema = await service.getOneById(id);
@@ -73,7 +73,9 @@ module.exports = {
 
   updateOneById: catchAsync(async (req, res, next) => {
     // Get skema id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
+
+    console.log(id);
 
     // Get data from request body.
     const data = req.body;
@@ -109,7 +111,7 @@ module.exports = {
 
   deleteOneById: catchAsync(async (req, res, next) => {
     // Get skema id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Check if skema exists using service.
     const skema = await service.isExist(id);

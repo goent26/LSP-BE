@@ -85,4 +85,14 @@ module.exports = {
 
     return !!skema;
   },
+
+  async countAll(filter) {
+    const DB = getDB();
+  
+    const count = await DB.skema.count({
+      where: filter || {},
+    });
+  
+    return count;
+  }  
 };

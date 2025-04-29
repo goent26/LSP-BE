@@ -25,7 +25,7 @@ module.exports = {
 
   getOneById: catchAsync(async (req, res, next) => {
     // Get tuk id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Get tuk using service.
     const tuk = await service.getOneById(id);
@@ -75,7 +75,7 @@ module.exports = {
 
   updateOneById: catchAsync(async (req, res, next) => {
     // Get tuk id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Get data from request body.
     const data = req.body;
@@ -113,7 +113,7 @@ module.exports = {
 
   deleteOneById: catchAsync(async (req, res, next) => {
     // Get tuk id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Check if tuk exists using service.
     const tuk = await service.isExist(id);

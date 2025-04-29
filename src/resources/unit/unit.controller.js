@@ -25,7 +25,7 @@ module.exports = {
 
   getOneById: catchAsync(async (req, res, next) => {
     // Get unit id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Get unit using service.
     const unit = await service.getOneById(id);
@@ -74,7 +74,7 @@ module.exports = {
 
   updateOneById: catchAsync(async (req, res, next) => {
     // Get unit id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Get data from request body.
     const data = req.body;
@@ -111,7 +111,7 @@ module.exports = {
 
   deleteOneById: catchAsync(async (req, res, next) => {
     // Get unit id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Check if unit exists using service.
     const unit = await service.isExist(id);

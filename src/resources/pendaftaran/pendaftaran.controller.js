@@ -41,6 +41,8 @@ module.exports = {
         .send();
     }
 
+    console.log("userId: ", userId);
+
     // insert data to service
     const user = await service.postPendaftaranApl1(userId, data);
 

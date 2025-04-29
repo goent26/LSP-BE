@@ -74,7 +74,7 @@ module.exports = {
 
   updateOneById: catchAsync(async (req, res, next) => {
     // Get user id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Get data from request body.
     const data = req.body;
@@ -110,7 +110,7 @@ module.exports = {
 
   deleteOneById: catchAsync(async (req, res, next) => {
     // Get user id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Check if user exists using service.
     const user = await service.isExist(id);

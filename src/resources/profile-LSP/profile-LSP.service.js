@@ -27,7 +27,8 @@ module.exports = {
       website_link,
       no_fax,
       no_hp, 
-      email
+      email,
+      masa_berlaku,
     } = data;
 
     const profileLSP = await DB.profileLSP.create({
@@ -39,7 +40,8 @@ module.exports = {
         website_link,
         no_fax,
         no_hp,
-        email
+        email,
+        masa_berlaku,
       }
     })
     return profileLSP

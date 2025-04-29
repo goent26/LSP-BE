@@ -103,4 +103,14 @@ module.exports = {
 
     return !!user;
   },
+
+  async countAll(filter) {
+    const DB = getDB();
+  
+    const count = await DB.user.count({
+      where: filter || {},
+    });
+  
+    return count;
+  }  
 };

@@ -8,7 +8,7 @@ module.exports = {
     // Create the find options object.
     const findOptions = {
       include: {
-        elemen_kuk: true,
+        skema: true,
       },
     };
 
@@ -26,7 +26,7 @@ module.exports = {
     const findOptions = {
       where: { id },
       include: {
-        elemen_kuk: true,
+        skema: true,
       },
     };
 
@@ -79,4 +79,14 @@ module.exports = {
 
     return !!tuk;
   },
+
+  async countAll(filter) {
+    const DB = getDB();
+  
+    const count = await DB.TUK.count({
+      where: filter || {},
+    });
+  
+    return count;
+  }  
 };

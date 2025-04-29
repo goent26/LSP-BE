@@ -25,7 +25,7 @@ module.exports = {
 
   getOneById: catchAsync(async (req, res, next) => {
     // Get muk id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Get muk using service.
     const muk = await service.getOneById(id);
@@ -73,7 +73,7 @@ module.exports = {
 
   updateOneById: catchAsync(async (req, res, next) => {
     // Get muk id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Get data from request body.
     const data = req.body;
@@ -109,7 +109,7 @@ module.exports = {
 
   deleteOneById: catchAsync(async (req, res, next) => {
     // Get muk id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Check if muk exists using service.
     const muk = await service.isExist(id);

@@ -62,8 +62,7 @@ module.exports = {
           user_id: userId,
         },
       });
-    return {status : true, data: createdProfile};
-      
+      return {status : true, data: createdProfile};
     }
   },
 

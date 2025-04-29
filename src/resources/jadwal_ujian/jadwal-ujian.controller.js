@@ -27,7 +27,7 @@ module.exports = {
 
   getOneById: catchAsync(async (req, res, next) => {
     // Get jadwal ujian id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Get jadwal ujian using service.
     const jadwalUjian = await service.getOneById(id);
@@ -93,7 +93,7 @@ module.exports = {
 
   updateOneById: catchAsync(async (req, res, next) => {
     // Get jadwal ujian id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Get data from request body.
     const data = req.body;
@@ -115,7 +115,7 @@ module.exports = {
 
   deleteOneById: catchAsync(async (req, res, next) => {
     // Get jadwal ujian id from request parameters.
-    const id = Number(req.params.id);
+    const id = req.params.id;
 
     // Check if jadwal ujian exists using service.
     const jadwalUjian = await service.isExist(id);

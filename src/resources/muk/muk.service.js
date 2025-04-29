@@ -6,11 +6,7 @@ const getDB = () => {
 module.exports = {
   async getAll(filter) {
     // Create the find options object.
-    const findOptions = {
-      include: {
-        elemen_kuk: true,
-      },
-    };
+    const findOptions = {};
 
     // Add the filter to the find options.
     if (filter) findOptions.where = { ...filter };
@@ -25,9 +21,6 @@ module.exports = {
     // Create the find options object.
     const findOptions = {
       where: { id },
-      include: {
-        elemen_kuk: true,
-      },
     };
 
     // Retrieve the muk.

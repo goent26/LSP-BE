@@ -1,16 +1,30 @@
 const service = require('./profile-LSP.service');
+const serviceSkema = require('../skema/skema.service');
+const serviceUser = require('../users/users.service');
+const serviceSertifikasi = require('../sertifikasi/sertifikasi.service');
+const serviceTuk = require('../tuk/tuk.service');
 const { catchAsync, AppError, JsonResponse } = require('../../utils');
-
 
 module.exports = {
 
   getAll: catchAsync(async (req, res) => {
     try {
+      const getSkema = await serviceSkema.countAll();
+      const getAsesor = await serviceUser.countAll({ role: "asesor" });
+      const getTuk = await serviceTuk.countAll();
+      const getSertikasi = await serviceSertifikasi.countAll();
+
       const getData = await service.getAll();
 
       return new JsonResponse(res, 200)
         .setMainContent(true, "Data profile LSP ditemukan")
-        .setSuccessPayload({ data: getData })
+        .setSuccessPayload({ 
+          count_skema: getSkema,
+          count_asesor: getAsesor,
+          count_sertifikasi: getSertikasi,
+          count_tuk: getTuk,
+          data: getData
+        })
         .send();
     } catch (error) {
       throw new AppError("Gagal mengambil data profile LSP", 500, error, {
